@@ -1,4 +1,4 @@
-<h1 align="center">AgentOS</h1>
+<h1 align="center">AgentOS-kit</h1>
 
 <h4 align="center">A multi-agent operating system for software delivery, built for <a href="https://claude.com/claude-code">Claude Code</a> and any orchestrator you point it at.</h4>
 
