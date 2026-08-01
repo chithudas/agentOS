@@ -147,38 +147,9 @@ What it covers:
 5. **Provider Adapters** — a task targets `fast` / `standard` / `deep`, not a specific model or vendor
 6. **Local Memory** — durable takeaways get compressed to a few sentences, embedded, and retrieved only when relevant — never replayed in full
 
-```mermaid
-flowchart TD
-    SPEC["PROJECT_SPEC.md"] --> ORCH{{"Orchestrator"}}
-    ORCH -->|"decompose"| PLANNER["Planner"]
-    PLANNER --> GRAPH[("Task Graph")]
-    ORCH --> GRAPH
-    GRAPH --> POOL
-
-    subgraph POOL["Agent Pool — 35 roles"]
-        direction LR
-        CORE["Core Delivery (11)"]
-        SPECIAL["Specialists (24)"]
-    end
-
-    POOL --> OUTPUT["Agent Output"]
-    OUTPUT --> GATE{"Review Pipeline"}
-
-    subgraph STAGES[" "]
-        direction LR
-        SEC["security"]
-        PRIV["privacy"]
-        LEG["legal"]
-        QA["qa"]
-        DOCS["docs"]
-    end
-
-    GATE --> STAGES
-    STAGES --> MERGE["Merge · CI/CD · GitHub"]
-    MERGE --> DASH["Dashboard"]
-    MERGE --> MEM[("Local Memory")]
-    MEM -.->|"retrieval, token-budget capped"| ORCH
-```
+<p align="center">
+  <img src="docs/architecture-flow.png" alt="AgentOS architecture flow: PROJECT_SPEC.md through the orchestrator, planner, task graph, agent pool, review pipeline, merge, dashboard, and back through local memory" width="420">
+</p>
 
 ---
 

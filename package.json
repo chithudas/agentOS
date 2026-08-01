@@ -1,6 +1,6 @@
 {
   "name": "agentos-kit",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Scaffold the AgentOS multi-agent software-delivery framework into any project",
   "bin": {
     "agentos-kit": "bin/cli.js"
