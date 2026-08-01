@@ -74,9 +74,12 @@
 <div class="empty" id="empty" style="display:none">No tasks match the current filters.</div>
 
 <script>
-// Sample data in the shape of TASK_SCHEMA.json + AGENT_OUTPUT_SCHEMA.json.
-// Replace this array with a live feed (fetch from the orchestrator's task store) when wiring this up for real.
-const TASKS = [
+// Fallback sample data in the shape of TASK_SCHEMA.json + AGENT_OUTPUT_SCHEMA.json.
+// Used only if /api/tasks isn't reachable (e.g. this file opened directly via
+// file:// instead of through status-server.js, or the orchestrator's task
+// ledger is still empty). When the live endpoint responds, TASKS is replaced
+// with real data polled from agentos-tasks.json.
+let TASKS = [
   {
     task_id: "TASK-0001", role: "database", title: "Add users table + auth indexes",
     priority: "p1", status: "done", review_flags: ["security"],
@@ -133,8 +136,13 @@ function renderFindings(output) {
 function populateFilters(tasks) {
   const statusSel = document.getElementById("filter-status");
   const roleSel = document.getElementById("filter-role");
+  const prevStatus = statusSel.value, prevRole = roleSel.value;
+  statusSel.innerHTML = `<option value="">All statuses</option>`;
+  roleSel.innerHTML = `<option value="">All roles</option>`;
   [...new Set(tasks.map(t=>t.status))].forEach(s => statusSel.insertAdjacentHTML("beforeend", `<option value="${s}">${s}</option>`));
   [...new Set(tasks.map(t=>t.role))].forEach(r => roleSel.insertAdjacentHTML("beforeend", `<option value="${r}">${r}</option>`));
+  statusSel.value = prevStatus;
+  roleSel.value = prevRole;
 }
 
 function render() {
@@ -169,8 +177,28 @@ populateFilters(TASKS);
 ["filter-status","filter-role","filter-search"].forEach(id =>
   document.getElementById(id).addEventListener("input", render)
 );
-document.getElementById("last-updated").textContent = "Loaded " + new Date().toLocaleString();
 render();
+
+async function loadLive() {
+  try {
+    const res = await fetch("/api/tasks", { cache: "no-store" });
+    if (!res.ok) throw new Error("bad response");
+    const live = await res.json();
+    if (Array.isArray(live) && live.length > 0) {
+      TASKS = live;
+      document.getElementById("last-updated").textContent = "Live — updated " + new Date().toLocaleString();
+    } else {
+      document.getElementById("last-updated").textContent = "Live server reachable, task ledger empty — " + new Date().toLocaleString();
+    }
+  } catch (e) {
+    document.getElementById("last-updated").textContent = "Sample data (start status-server.js for live view) — " + new Date().toLocaleString();
+  }
+  populateFilters(TASKS);
+  render();
+}
+
+loadLive();
+setInterval(loadLive, 3000);
 </script>
 
 </body>

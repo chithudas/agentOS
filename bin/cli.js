@@ -77,23 +77,47 @@ Next steps:
        cp templates/web-saas.md PROJECT_SPEC.md
   3. Fill in the bracketed specifics in PROJECT_SPEC.md
   4. Hand AgentOS_MASTER_BUILD_SPEC.md + PROJECT_SPEC.md to your orchestrator to begin
+  5. Run \`node status-server.js\` and open http://localhost:4500 for a live view
+     as the orchestrator writes real progress to ./agentos-tasks.json
 `);
 }
 
 const STATUS_BOARD_NAME = "agentos-status.html";
+const STATUS_SERVER_NAME = "status-server.js";
+const TASKS_LEDGER_NAME = "agentos-tasks.json";
+
+function copyIfAbsent(src, dest, label) {
+  if (!fs.existsSync(src)) return "";
+  if (fs.existsSync(dest)) {
+    return `Skipped — ./${label} already exists at project root (not overwritten).`;
+  }
+  fs.copyFileSync(src, dest);
+  return null;
+}
 
 function installStatusBoard(target) {
-  const src = path.join(target, "dashboard", "dashboard-template.html");
-  const dest = path.join(process.cwd(), STATUS_BOARD_NAME);
+  const dashboardDir = path.join(target, "dashboard");
+  const root = process.cwd();
 
-  if (!fs.existsSync(src)) return "";
+  if (!fs.existsSync(path.join(dashboardDir, "dashboard-template.html"))) return "";
 
-  if (fs.existsSync(dest)) {
-    return `\nStatus board skipped — ./${STATUS_BOARD_NAME} already exists at project root (not overwritten).\n`;
+  const results = [
+    copyIfAbsent(path.join(dashboardDir, "dashboard-template.html"), path.join(root, STATUS_BOARD_NAME), STATUS_BOARD_NAME),
+    copyIfAbsent(path.join(dashboardDir, "status-server.js"), path.join(root, STATUS_SERVER_NAME), STATUS_SERVER_NAME),
+    copyIfAbsent(path.join(dashboardDir, "agentos-tasks.example.json"), path.join(root, TASKS_LEDGER_NAME), TASKS_LEDGER_NAME),
+  ];
+
+  const skipped = results.filter((r) => typeof r === "string" && r !== "");
+  const installedCount = results.filter((r) => r === null).length;
+
+  const lines = [];
+  if (installedCount > 0) {
+    lines.push(`\nStatus board installed at ./${STATUS_BOARD_NAME}, ./${STATUS_SERVER_NAME}, and ./${TASKS_LEDGER_NAME}.`);
+    lines.push(`This is a real live server, not a static preview — it polls ./${TASKS_LEDGER_NAME} on disk, which your`);
+    lines.push(`orchestrator updates as it dispatches and completes tasks (see DASHBOARD_SPEC.md).`);
   }
-
-  fs.copyFileSync(src, dest);
-  return `\nStatus board installed at ./${STATUS_BOARD_NAME} — open it in a browser for a live task/review view (ships with sample data; see DASHBOARD_SPEC.md to wire it to a real task store).\n`;
+  skipped.forEach((msg) => lines.push(msg));
+  return lines.length ? lines.join("\n") + "\n" : "";
 }
 
 main();

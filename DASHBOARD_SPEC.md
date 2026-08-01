@@ -1,16 +1,21 @@
 # Dashboard Spec
 
-The architecture behind [dashboard/dashboard-template.html](dashboard/dashboard-template.html). The template is a self-contained static reference implementation with sample data; this spec describes what a live deployment needs.
+The architecture behind [dashboard/dashboard-template.html](dashboard/dashboard-template.html) and its reference live server, [dashboard/status-server.js](dashboard/status-server.js). Together these are a real, runnable local dashboard, not just a static mockup — this spec describes how the pieces fit and what a fuller deployment would add.
 
 ![AgentOS status board sample](docs/dashboard-preview.png)
 
 ## 0. Install-time status board
-Both installers ([`bin/cli.js`](bin/cli.js) and [`install.sh`](install.sh)) always copy this template to `./agentos-status.html` at the **host project's root** — not nested inside the `agentos/` subdirectory — the moment AgentOS is installed. The intent is that a status board is always one double-click away, without needing to know the framework's internal directory layout first. If a file of that name already exists at root, the installer skips the copy and says so rather than overwriting it. Until it's wired to a real task store per §1, it renders the sample data baked into the template — a live preview of the shape of the real thing, not a placeholder image.
+Both installers ([`bin/cli.js`](bin/cli.js) and [`install.sh`](install.sh)) always copy three files to the **host project's root** — not nested inside the `agentos/` subdirectory — the moment AgentOS is installed:
+- `agentos-status.html` — the dashboard UI (from `dashboard/dashboard-template.html`)
+- `status-server.js` — a zero-dependency Node HTTP server (from `dashboard/status-server.js`) that serves the UI and a live `/api/tasks` endpoint reading `agentos-tasks.json` off disk, bound to `127.0.0.1` only
+- `agentos-tasks.json` — the task ledger the orchestrator writes to (seeded empty, from `dashboard/agentos-tasks.example.json`)
+
+Run `node status-server.js` and open `http://localhost:4500` for a live view. This is real, working infrastructure, not a description of what one would need to build — the reference orchestrator loop is: decompose work into [TASK_SCHEMA.json](TASK_SCHEMA.json)-shaped entries, append/update them in `agentos-tasks.json` as tasks are dispatched and completed, and the page polls that file every few seconds and re-renders. If any of the three files already exists at root, the installer skips that one and says so rather than overwriting it. If `agentos-tasks.json` is empty or the server isn't running, the page falls back to its baked-in sample data, clearly labeled as such rather than presented as real progress.
 
 ## 1. Data source
-- Backing store: the live [TASK_SCHEMA.json](TASK_SCHEMA.json) task set plus each task's latest [AGENT_OUTPUT_SCHEMA.json](AGENT_OUTPUT_SCHEMA.json), as maintained by the orchestrator ([ORCHESTRATOR_SPEC.md](ORCHESTRATOR_SPEC.md)).
-- The dashboard is a read-only view. It never writes task state — any action a human takes (approve, reassign, escalate-response) goes through the orchestrator's own interface/API, not a direct dashboard mutation, so [STATE_MACHINES.md](STATE_MACHINES.md) transitions stay single-authored.
-- Live deployments replace the template's embedded `TASKS` array with a fetch/subscription against the orchestrator's task store (poll or push — push preferred so state changes reflect immediately per [STATE_MACHINES.md](STATE_MACHINES.md) event-driven scheduling).
+- Backing store: `agentos-tasks.json`, an array of [TASK_SCHEMA.json](TASK_SCHEMA.json)-shaped entries each carrying its latest [AGENT_OUTPUT_SCHEMA.json](AGENT_OUTPUT_SCHEMA.json)-shaped `output`, maintained by whatever is acting as orchestrator ([ORCHESTRATOR_SPEC.md](ORCHESTRATOR_SPEC.md)) for the project — a Claude Code session, a custom agent runner, or a future standalone orchestrator process.
+- The dashboard is a read-only view. It never writes task state — any action a human takes (approve, reassign, escalate-response) goes through the orchestrator's own process, not a direct dashboard mutation, so [STATE_MACHINES.md](STATE_MACHINES.md) transitions stay single-authored.
+- `status-server.js` is the reference read path (poll `agentos-tasks.json`, serve it as JSON). A fuller deployment may replace the polling loop with a push/subscription channel (WebSocket, SSE) against a real orchestrator process instead of a flat file — the frontend's `loadLive()` function is the only piece that would need to change.
 
 ## 2. Required views
 1. **Task list** (implemented in the template) — filterable by status/role/search, showing findings/notes inline. This is the default view.

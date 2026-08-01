@@ -79,11 +79,16 @@ Then:
 
 ## Status Board
 
-Every install — `npx agentos-kit`, the curl script, or `install.sh` — always drops a status board at `./agentos-status.html`, sitting at your project's root next to your own files, not buried inside the `agentos/` subdirectory. Open it in a browser and you get a filterable task list: status, role, priority, review flags, and inline findings.
+Every install — `npx agentos-kit`, the curl script, or `install.sh` — always drops three files at your project's root, next to your own files, not buried inside the `agentos/` subdirectory: `agentos-status.html` (the dashboard), `status-server.js` (a real, zero-dependency Node server), and `agentos-tasks.json` (the task ledger).
+
+```bash
+node status-server.js
+# open http://localhost:4500
+```
 
 ![AgentOS status board sample](docs/dashboard-preview.png)
 
-It ships pre-loaded with sample data so you see the real UI immediately — no setup required to look at it. To make it live, point it at your orchestrator's actual task store per [`DASHBOARD_SPEC.md`](DASHBOARD_SPEC.md). If a file already named `agentos-status.html` exists at your root, the installer leaves it alone and tells you so rather than overwriting it.
+This is a working live board, not a static mockup — `status-server.js` polls `agentos-tasks.json` and serves it over `/api/tasks`; the page re-fetches every few seconds. Whatever you're using as orchestrator (a Claude Code session, a custom runner) writes [`TASK_SCHEMA.json`](TASK_SCHEMA.json)-shaped entries to that file as it dispatches and completes work, and the board reflects it in real time — the same pattern used to build and review AgentOS's own reference NexusChat build. The ledger ships empty; until something writes to it, the page shows its baked-in sample data, clearly labeled as a preview rather than real progress. If any of the three files already exists at your root, the installer skips it and says so rather than overwriting it.
 
 ---
 

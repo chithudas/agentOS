@@ -28,15 +28,38 @@ git clone --depth 1 "$REPO_URL" "$TARGET"
 rm -rf "$TARGET/.git" "$TARGET/install.sh"
 
 STATUS_BOARD="agentos-status.html"
+STATUS_SERVER="status-server.js"
+TASKS_LEDGER="agentos-tasks.json"
+installed_any=0
+
 if [ -f "$TARGET/dashboard/dashboard-template.html" ]; then
   if [ -e "$STATUS_BOARD" ]; then
     echo
-    echo "Status board skipped — ./$STATUS_BOARD already exists at project root (not overwritten)."
+    echo "Skipped — ./$STATUS_BOARD already exists at project root (not overwritten)."
   else
     cp "$TARGET/dashboard/dashboard-template.html" "$STATUS_BOARD"
+    installed_any=1
+  fi
+
+  if [ -e "$STATUS_SERVER" ]; then
+    echo "Skipped — ./$STATUS_SERVER already exists at project root (not overwritten)."
+  else
+    cp "$TARGET/dashboard/status-server.js" "$STATUS_SERVER"
+    installed_any=1
+  fi
+
+  if [ -e "$TASKS_LEDGER" ]; then
+    echo "Skipped — ./$TASKS_LEDGER already exists at project root (not overwritten)."
+  else
+    cp "$TARGET/dashboard/agentos-tasks.example.json" "$TASKS_LEDGER"
+    installed_any=1
+  fi
+
+  if [ "$installed_any" = "1" ]; then
     echo
-    echo "Status board installed at ./$STATUS_BOARD — open it in a browser for a live task/review view"
-    echo "(ships with sample data; see DASHBOARD_SPEC.md to wire it to a real task store)."
+    echo "Status board installed at ./$STATUS_BOARD, ./$STATUS_SERVER, and ./$TASKS_LEDGER."
+    echo "This is a real live server, not a static preview — it polls ./$TASKS_LEDGER on disk, which your"
+    echo "orchestrator updates as it dispatches and completes tasks (see DASHBOARD_SPEC.md)."
   fi
 fi
 
@@ -49,3 +72,5 @@ echo "  2. Copy a starting point from templates/ over PROJECT_SPEC.md, e.g.:"
 echo "       cp templates/web-saas.md PROJECT_SPEC.md"
 echo "  3. Fill in the bracketed specifics in PROJECT_SPEC.md"
 echo "  4. Hand AgentOS_MASTER_BUILD_SPEC.md + PROJECT_SPEC.md to your orchestrator to begin"
+echo "  5. Run \`node status-server.js\` and open http://localhost:4500 for a live view"
+echo "     as the orchestrator writes real progress to ./agentos-tasks.json"
