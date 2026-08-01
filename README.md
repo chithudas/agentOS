@@ -6,17 +6,26 @@ This repo is the spec: a complete set of markdown/JSON documents defining how su
 
 ## Quickstart
 
-**Option A — copy into an existing project:**
+**Option A — npm (recommended):**
+
+```bash
+npx create-agent-os
+# or: npm create agent-os@latest
+```
+
+**Option B — curl into an existing project:**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/prodnium/agentos/main/install.sh | bash -s -- agentos
 ```
 
-**Option B — clone directly:**
+**Option C — clone directly:**
 
 ```bash
 git clone https://github.com/prodnium/agentos.git
 ```
+
+All three do the same thing: drop the full framework into `./agentos` (or a target directory you name), with no runtime dependencies pulled in — it's markdown and JSON, not code.
 
 Then:
 

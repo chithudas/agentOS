@@ -1,0 +1,42 @@
+{
+  "name": "create-agent-os",
+  "version": "1.0.0",
+  "description": "Scaffold the AgentOS multi-agent software-delivery framework into any project",
+  "bin": {
+    "create-agent-os": "bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "agents",
+    "prompts",
+    "providers",
+    "workflows",
+    "templates",
+    "dashboard",
+    "*.md",
+    "*.json"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "keywords": [
+    "ai-agents",
+    "multi-agent",
+    "orchestration",
+    "software-delivery",
+    "claude",
+    "llm",
+    "scaffold",
+    "cli"
+  ],
+  "license": "MIT",
+  "author": "prodnium",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prodnium/agentos.git"
+  },
+  "homepage": "https://github.com/prodnium/agentos#readme",
+  "bugs": {
+    "url": "https://github.com/prodnium/agentos/issues"
+  }
+}
