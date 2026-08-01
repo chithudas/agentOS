@@ -16,11 +16,10 @@ const EXCLUDE = new Set([
 ]);
 
 function printHelp() {
-  console.log(`create-agent-os — scaffold the AgentOS framework into a project
+  console.log(`agentos-kit — scaffold the AgentOS framework into a project
 
 Usage:
-  npx @chithudas/create-agent-os [target-dir]
-  npm create @chithudas/agent-os@latest [target-dir]
+  npx agentos-kit [target-dir]
 
   target-dir   Where to copy AgentOS into (default: agentos)
 
