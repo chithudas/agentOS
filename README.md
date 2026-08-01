@@ -22,6 +22,7 @@
   <a href="#status-board">Status Board</a> •
   <a href="#how-it-works">How It Works</a> •
   <a href="#the-roster">Roster</a> •
+  <a href="docs/CASE_STUDY.md">Case Study</a> •
   <a href="#documentation">Documentation</a> •
   <a href="#extending-agentos">Extending</a> •
   <a href="#license">License</a>
@@ -98,6 +99,7 @@ This is a working live board, not a static mockup — `status-server.js` polls `
 - **[AgentOS_MASTER_BUILD_SPEC.md](AgentOS_MASTER_BUILD_SPEC.md)** — entry point, the map of every other document
 - **[PROJECT_SPEC.md](PROJECT_SPEC.md)** — per-project scope template
 - **[PROJECT_TEMPLATES.md](PROJECT_TEMPLATES.md)** + **[templates/](templates/)** — starting points per project archetype
+- **[docs/CASE_STUDY.md](docs/CASE_STUDY.md)** — a real run-through: building a messaging app with AgentOS, including the mistakes, the parallelism correction, and the real bugs a review pass caught
 
 ### Core Contracts
 - **[AGENT_CONTRACT.md](AGENT_CONTRACT.md)** — rules every agent follows, regardless of role
