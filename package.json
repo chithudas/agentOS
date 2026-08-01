@@ -33,10 +33,10 @@
   "author": "Chidambara Das Ganesan Nageswari <chithudas@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chithudas/agentOS.git"
+    "url": "git+https://github.com/chithudas/agentos-kit.git"
   },
-  "homepage": "https://github.com/chithudas/agentOS#readme",
+  "homepage": "https://github.com/chithudas/agentos-kit#readme",
   "bugs": {
-    "url": "https://github.com/chithudas/agentOS/issues"
+    "url": "https://github.com/chithudas/agentos-kit/issues"
   }
 }

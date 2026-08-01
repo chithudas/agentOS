@@ -8,12 +8,12 @@
 #   repo-url     Git URL to clone from (default: this project's GitHub repo)
 #
 # Example:
-#   curl -fsSL https://raw.githubusercontent.com/chithudas/agentOS/main/install.sh | bash -s -- agentos
+#   curl -fsSL https://raw.githubusercontent.com/chithudas/agentos-kit/main/install.sh | bash -s -- agentos
 
 set -euo pipefail
 
 TARGET="${1:-agentos}"
-REPO_URL="${2:-https://github.com/chithudas/agentOS.git}"
+REPO_URL="${2:-https://github.com/chithudas/agentos-kit.git}"
 
 if [ -e "$TARGET" ]; then
   echo "Error: '$TARGET' already exists. Choose a different target directory or remove it first." >&2

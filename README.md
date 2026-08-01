@@ -15,13 +15,13 @@ npx agentos-kit
 **Option B — curl into an existing project:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/chithudas/agentOS/main/install.sh | bash -s -- agentos
+curl -fsSL https://raw.githubusercontent.com/chithudas/agentos-kit/main/install.sh | bash -s -- agentos
 ```
 
 **Option C — clone directly:**
 
 ```bash
-git clone https://github.com/chithudas/agentOS.git
+git clone https://github.com/chithudas/agentos-kit.git
 ```
 
 All three do the same thing: drop the full framework into `./agentos` (or a target directory you name), with no runtime dependencies pulled in — it's markdown and JSON, not code.
