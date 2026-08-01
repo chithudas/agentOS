@@ -1,4 +1,7 @@
-<h1 align="center">AgentOS-kit</h1>
+<h1 align="center">
+  <img src="docs/agentos-kit-icon.png" alt="AgentOS-kit" width="120"><br>
+  AgentOS-kit
+</h1>
 
 <h4 align="center">A multi-agent operating system for software delivery, built for <a href="https://claude.com/claude-code">Claude Code</a> and any orchestrator you point it at.</h4>
 
@@ -174,6 +177,12 @@ Full detail, tiers, and default review requirements: **[agents/AGENT_INDEX.md](a
 - **New agent or tool** — see [`PLUGIN_SDK.md`](PLUGIN_SDK.md).
 - **New project type** — add a file to [`templates/`](templates/) following the existing ones' structure.
 - **New provider** — implement the interface in [`providers/PROVIDER_ADAPTER_SPEC.md`](providers/PROVIDER_ADAPTER_SPEC.md).
+
+---
+
+## Author
+
+Built by **Chidambara Das Ganesan Nageswari** — [@chithudas](https://github.com/chithudas)
 
 ---
 
