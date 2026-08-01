@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentos/schemas/task.json",
+  "title": "AgentOS Task",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "role", "title", "description", "context", "file_scope", "review_flags", "priority", "status", "model_tier"],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "description": "Stable unique identifier, e.g. TASK-0042"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "planner", "backend", "frontend", "mobile", "database", "security", "privacy", "legal", "qa", "docs",
+        "ios-specialist", "android-specialist", "api-designer", "graphql-architect", "devops-engineer",
+        "sre-engineer", "release-engineer", "incident-responder", "dependency-manager", "finops-engineer",
+        "i18n-engineer", "accessibility-engineer", "performance-engineer", "prompt-engineer", "ml-engineer",
+        "data-engineer", "cloud-architect", "observability-engineer", "code-reviewer", "refactoring-specialist",
+        "test-automation-engineer", "build-engineer", "ui-designer", "auth-identity-engineer"
+      ],
+      "description": "Which specialist agent this task is routed to. Full roster and responsibilities in agents/AGENT_INDEX.md"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short imperative summary, e.g. 'Add rate limiting to /login'"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full task detail: what to change, why, and any acceptance criteria"
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "project_spec_ref": { "type": "string", "description": "Section of PROJECT_SPEC.md this task serves" },
+        "related_task_ids": { "type": "array", "items": { "type": "string" } },
+        "relevant_files": { "type": "array", "items": { "type": "string" } },
+        "background": { "type": "string", "description": "Any prior findings/decisions the agent needs but shouldn't have to rediscover" }
+      }
+    },
+    "file_scope": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Files/paths the agent is authorized to touch. Empty array for pure-review tasks."
+    },
+    "review_flags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["security", "privacy", "legal", "qa", "docs"]
+      },
+      "description": "Which REVIEW_PIPELINE.md stages are mandatory for this task before merge"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["p0", "p1", "p2", "p3"]
+    },
+    "model_tier": {
+      "type": "string",
+      "enum": ["fast", "standard", "deep"],
+      "description": "See providers/PROVIDER_ADAPTER_SPEC.md §1. Orchestrator sets this per role default unless overridden."
+    },
+    "provider": {
+      "type": "string",
+      "enum": ["anthropic", "openai", "google"],
+      "description": "Explicit provider override; absent means use the project/global default per providers/PROVIDER_ADAPTER_SPEC.md §4"
+    },
+    "mcp_capabilities": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "MCP capability tags this task's agent needs beyond its role default, per MCP_INTEGRATION.md §3"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["queued", "in_progress", "blocked", "in_review", "done", "rejected"]
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Concrete, checkable conditions for done"
+    },
+    "workflow": {
+      "type": "string",
+      "enum": ["vertical-slice", "bugfix", "release", "hotfix"],
+      "description": "Which workflows/*.md definition governs this task's lifecycle"
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AgentOS Dashboard</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff; --fg: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
+    --card: #f9fafb; --accent: #2563eb;
+    --blocker: #dc2626; --high: #ea580c; --medium: #ca8a04; --low: #65a30d; --info: #6b7280;
+    --queued: #94a3b8; --in_progress: #2563eb; --blocked: #dc2626; --in_review: #ca8a04; --done: #16a34a; --rejected: #6b7280;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f1115; --fg: #e5e7eb; --muted: #9ca3af; --border: #262b33; --card: #171a21; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  header h1 { font-size: 18px; margin: 0; }
+  header .sub { color: var(--muted); font-size: 12px; }
+  .summary { display: flex; gap: 10px; padding: 16px 24px; flex-wrap: wrap; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; min-width: 90px; }
+  .stat .n { font-size: 22px; font-weight: 700; }
+  .stat .l { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+  .controls { display: flex; gap: 8px; padding: 0 24px 12px; flex-wrap: wrap; }
+  .controls select, .controls input { background: var(--card); color: var(--fg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); padding: 8px 24px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); }
+  td { padding: 10px 24px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: var(--card); }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #fff; }
+  .role-pill { background: var(--card); color: var(--fg); border: 1px solid var(--border); font-weight: 500; }
+  .findings { margin-top: 6px; font-size: 12px; }
+  .finding { border-left: 3px solid var(--info); padding: 2px 0 2px 8px; margin-bottom: 3px; }
+  .finding.blocker { border-color: var(--blocker); } .finding.high { border-color: var(--high); }
+  .finding.medium { border-color: var(--medium); } .finding.low { border-color: var(--low); }
+  .task-title { font-weight: 600; }
+  .task-id { color: var(--muted); font-size: 11px; }
+  .empty { text-align: center; color: var(--muted); padding: 40px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>AgentOS Dashboard</h1>
+    <div class="sub">Task pipeline status — reads TASK_SCHEMA.json / AGENT_OUTPUT_SCHEMA.json shaped data</div>
+  </div>
+  <div class="sub" id="last-updated"></div>
+</header>
+
+<div class="summary" id="summary"></div>
+
+<div class="controls">
+  <select id="filter-status"><option value="">All statuses</option></select>
+  <select id="filter-role"><option value="">All roles</option></select>
+  <input id="filter-search" type="text" placeholder="Search title…">
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:22%">Task</th>
+      <th style="width:10%">Role</th>
+      <th style="width:10%">Priority</th>
+      <th style="width:12%">Status</th>
+      <th style="width:14%">Review flags</th>
+      <th style="width:32%">Findings / notes</th>
+    </tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table>
+<div class="empty" id="empty" style="display:none">No tasks match the current filters.</div>
+
+<script>
+// Sample data in the shape of TASK_SCHEMA.json + AGENT_OUTPUT_SCHEMA.json.
+// Replace this array with a live feed (fetch from the orchestrator's task store) when wiring this up for real.
+const TASKS = [
+  {
+    task_id: "TASK-0001", role: "database", title: "Add users table + auth indexes",
+    priority: "p1", status: "done", review_flags: ["security"],
+    output: { summary: "Added users table with unique email index.", findings: [], clean_categories: ["security"] }
+  },
+  {
+    task_id: "TASK-0002", role: "backend", title: "Implement /login endpoint",
+    priority: "p1", status: "in_review", review_flags: ["security", "qa"],
+    output: { summary: "Password auth with rate limiting.", findings: [
+      { category: "auth", severity: "medium", summary: "No lockout after repeated failures", trigger: "10 failed logins in a row", location: "auth/login.ts:42" }
+    ] }
+  },
+  {
+    task_id: "TASK-0003", role: "frontend", title: "Login form UI",
+    priority: "p2", status: "in_progress", review_flags: ["qa", "docs"],
+    output: null
+  },
+  {
+    task_id: "TASK-0004", role: "qa", title: "Regression pass: auth flow",
+    priority: "p1", status: "blocked", review_flags: [],
+    output: { summary: "", findings: [], blocked_reason: "Depends on TASK-0002 clearing security review first." }
+  },
+  {
+    task_id: "TASK-0005", role: "docs", title: "Document /login API contract",
+    priority: "p3", status: "queued", review_flags: [],
+    output: null
+  }
+];
+
+function statusPill(s) {
+  return `<span class="pill" style="background:var(--${s})">${s.replace('_',' ')}</span>`;
+}
+
+function renderSummary(tasks) {
+  const counts = {};
+  tasks.forEach(t => counts[t.status] = (counts[t.status]||0)+1);
+  const order = ["queued","in_progress","blocked","in_review","done","rejected"];
+  document.getElementById("summary").innerHTML = order.map(s =>
+    `<div class="stat"><div class="n">${counts[s]||0}</div><div class="l">${s.replace('_',' ')}</div></div>`
+  ).join("") + `<div class="stat"><div class="n">${tasks.length}</div><div class="l">total</div></div>`;
+}
+
+function renderFindings(output) {
+  if (!output) return "";
+  let html = "";
+  if (output.blocked_reason) html += `<div class="finding blocker">${output.blocked_reason}</div>`;
+  (output.findings||[]).forEach(f => {
+    html += `<div class="finding ${f.severity}"><strong>${f.severity}</strong> — ${f.summary} <span style="color:var(--muted)">(${f.location})</span></div>`;
+  });
+  if (output.summary) html += `<div style="color:var(--muted);margin-top:4px">${output.summary}</div>`;
+  return `<div class="findings">${html}</div>`;
+}
+
+function populateFilters(tasks) {
+  const statusSel = document.getElementById("filter-status");
+  const roleSel = document.getElementById("filter-role");
+  [...new Set(tasks.map(t=>t.status))].forEach(s => statusSel.insertAdjacentHTML("beforeend", `<option value="${s}">${s}</option>`));
+  [...new Set(tasks.map(t=>t.role))].forEach(r => roleSel.insertAdjacentHTML("beforeend", `<option value="${r}">${r}</option>`));
+}
+
+function render() {
+  const statusF = document.getElementById("filter-status").value;
+  const roleF = document.getElementById("filter-role").value;
+  const searchF = document.getElementById("filter-search").value.toLowerCase();
+
+  const filtered = TASKS.filter(t =>
+    (!statusF || t.status === statusF) &&
+    (!roleF || t.role === roleF) &&
+    (!searchF || t.title.toLowerCase().includes(searchF))
+  );
+
+  renderSummary(TASKS);
+
+  const rows = document.getElementById("rows");
+  rows.innerHTML = filtered.map(t => `
+    <tr>
+      <td><div class="task-title">${t.title}</div><div class="task-id">${t.task_id}</div></td>
+      <td><span class="pill role-pill">${t.role}</span></td>
+      <td>${t.priority}</td>
+      <td>${statusPill(t.status)}</td>
+      <td>${(t.review_flags||[]).join(", ") || "—"}</td>
+      <td>${renderFindings(t.output)}</td>
+    </tr>
+  `).join("");
+
+  document.getElementById("empty").style.display = filtered.length ? "none" : "block";
+}
+
+populateFilters(TASKS);
+["filter-status","filter-role","filter-search"].forEach(id =>
+  document.getElementById(id).addEventListener("input", render)
+);
+document.getElementById("last-updated").textContent = "Loaded " + new Date().toLocaleString();
+render();
+</script>
+
+</body>
+</html>

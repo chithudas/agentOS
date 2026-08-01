@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentos/schemas/agent_output.json",
+  "title": "AgentOS Agent Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "role", "status", "summary"],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "description": "Must match the task_id of the task this output responds to"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "planner", "backend", "frontend", "mobile", "database", "security", "privacy", "legal", "qa", "docs",
+        "ios-specialist", "android-specialist", "api-designer", "graphql-architect", "devops-engineer",
+        "sre-engineer", "release-engineer", "incident-responder", "dependency-manager", "finops-engineer",
+        "i18n-engineer", "accessibility-engineer", "performance-engineer", "prompt-engineer", "ml-engineer",
+        "data-engineer", "cloud-architect", "observability-engineer", "code-reviewer", "refactoring-specialist",
+        "test-automation-engineer", "build-engineer", "ui-designer", "auth-identity-engineer"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["completed", "blocked", "needs_review", "rejected"],
+      "description": "completed: work done and self-verified. blocked: cannot proceed, see blocked_reason. needs_review: done but requires a human/agent decision before merge. rejected: task itself is invalid (out of scope, conflicts with PROJECT_SPEC.md, etc)"
+    },
+    "summary": {
+      "type": "string",
+      "description": "One paragraph: what was done and why, for the dashboard and human review"
+    },
+    "blocked_reason": {
+      "type": "string",
+      "description": "Required if status is blocked or rejected. Specific and actionable."
+    },
+    "files_changed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "reason"],
+        "properties": {
+          "path": { "type": "string" },
+          "reason": { "type": "string" },
+          "in_scope": { "type": "boolean", "description": "false if outside the task's declared file_scope; requires a reason" }
+        }
+      }
+    },
+    "tests_added": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Paths of test files added or modified to cover this change"
+    },
+    "tests_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "command": { "type": "string" },
+        "passed": { "type": "boolean" },
+        "output_excerpt": { "type": "string" }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "description": "Used by review roles (security, privacy, legal, qa) per REVIEW_PIPELINE.md",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["category", "severity", "summary", "trigger", "location"],
+        "properties": {
+          "category": { "type": "string" },
+          "severity": { "type": "string", "enum": ["blocker", "high", "medium", "low", "info"] },
+          "summary": { "type": "string" },
+          "trigger": { "type": "string", "description": "Concrete condition/input that surfaces the issue" },
+          "location": { "type": "string", "description": "file:line or equivalent" }
+        }
+      }
+    },
+    "clean_categories": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Categories explicitly checked with no findings, per AGENT_CONTRACT.md §5"
+    },
+    "follow_up_findings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Unrelated issues noticed but not fixed, for the orchestrator to schedule as new tasks"
+    },
+    "docs_updated": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "model_used": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Which provider/model actually produced this output, per providers/PROVIDER_ADAPTER_SPEC.md",
+      "properties": {
+        "provider": { "type": "string", "enum": ["anthropic", "openai", "google"] },
+        "model_tier": { "type": "string", "enum": ["fast", "standard", "deep"] },
+        "model_id": { "type": "string" }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tokens_in": { "type": "integer" },
+        "tokens_out": { "type": "integer" },
+        "estimated_cost_usd": { "type": "number" }
+      }
+    }
+  }
+}
