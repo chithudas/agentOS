@@ -22,7 +22,7 @@
   <a href="#status-board">Status Board</a> •
   <a href="#how-it-works">How It Works</a> •
   <a href="#the-roster">Roster</a> •
-  <a href="docs/CASE_STUDY.md">Case Study</a> •
+  <a href="#case-study">Case Study</a> •
   <a href="#documentation">Documentation</a> •
   <a href="#extending-agentos">Extending</a> •
   <a href="#license">License</a>
@@ -90,6 +90,19 @@ node status-server.js
 ![AgentOS status board sample](docs/dashboard-preview.png)
 
 This is a working live board, not a static mockup — `status-server.js` polls `agentos-tasks.json` and serves it over `/api/tasks`; the page re-fetches every few seconds. Whatever you're using as orchestrator (a Claude Code session, a custom runner) writes [`TASK_SCHEMA.json`](TASK_SCHEMA.json)-shaped entries to that file as it dispatches and completes work, and the board reflects it in real time — the same pattern used to build and review AgentOS's own reference NexusChat build. The ledger ships empty; until something writes to it, the page shows its baked-in sample data, clearly labeled as a preview rather than real progress. If any of the three files already exists at your root, the installer skips it and says so rather than overwriting it.
+
+---
+
+## Case Study
+
+**[docs/CASE_STUDY.md](docs/CASE_STUDY.md) — Building NexusChat with AgentOS: a real run-through.** Not a hypothetical walkthrough — what actually happened installing this into an empty repo and building a WhatsApp-style messaging app with it. Every claim in it traces back to a real command, a real curl request, or a real subagent report.
+
+What it covers:
+- A `doc/` folder with ~120 files that looked like a complete spec — and turned out to be mostly unfilled scaffolding (`FR-042: Functional requirement placeholder.` ×200). Why reading before trusting a spec folder matters.
+- Why the first vertical slice (schema → API → UI) had to be dispatched **sequentially**, not in parallel — each stage genuinely needed the last one's output.
+- The mid-build correction after direct feedback that agents weren't running in parallel: the real fix wasn't "just parallelize everything," it was finding work that's actually safe to parallelize — read-only review, where twenty agents reading twenty different files can't collide.
+- The **blocker and four high-severity bugs** that twenty-agent review pass caught in code already called "verified working" — an unthrottled OTP brute-force path, an unguarded authorization check, a cross-conversation data leak, and more — plus how each was fixed and re-verified.
+- Seven concrete lessons distilled at the end, from "sequence by real dependency, not by habit" to "watch the dashboard."
 
 ---
 
