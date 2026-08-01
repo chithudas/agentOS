@@ -65,10 +65,12 @@ function main() {
     copyRecursive(path.join(PKG_ROOT, entry), path.join(target, entry));
   }
 
+  const statusBoard = installStatusBoard(target);
+
   const rel = path.relative(process.cwd(), target) || target;
   console.log(`
 AgentOS installed at ./${rel}
-
+${statusBoard}
 Next steps:
   1. cd ${rel}
   2. Copy a starting point from templates/ over PROJECT_SPEC.md, e.g.:
@@ -76,6 +78,22 @@ Next steps:
   3. Fill in the bracketed specifics in PROJECT_SPEC.md
   4. Hand AgentOS_MASTER_BUILD_SPEC.md + PROJECT_SPEC.md to your orchestrator to begin
 `);
+}
+
+const STATUS_BOARD_NAME = "agentos-status.html";
+
+function installStatusBoard(target) {
+  const src = path.join(target, "dashboard", "dashboard-template.html");
+  const dest = path.join(process.cwd(), STATUS_BOARD_NAME);
+
+  if (!fs.existsSync(src)) return "";
+
+  if (fs.existsSync(dest)) {
+    return `\nStatus board skipped — ./${STATUS_BOARD_NAME} already exists at project root (not overwritten).\n`;
+  }
+
+  fs.copyFileSync(src, dest);
+  return `\nStatus board installed at ./${STATUS_BOARD_NAME} — open it in a browser for a live task/review view (ships with sample data; see DASHBOARD_SPEC.md to wire it to a real task store).\n`;
 }
 
 main();

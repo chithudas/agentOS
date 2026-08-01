@@ -16,6 +16,7 @@
 
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
+  <a href="#status-board">Status Board</a> •
   <a href="#how-it-works">How It Works</a> •
   <a href="#the-roster">Roster</a> •
   <a href="#documentation">Documentation</a> •
@@ -49,9 +50,9 @@ Or curl into an existing project:
 curl -fsSL https://raw.githubusercontent.com/chithudas/agentos-kit/main/install.sh | bash -s -- agentos
 ```
 
-All three do the same thing: drop the full framework into `./agentos` (or a target directory you name). No runtime dependencies get pulled in — it's markdown and JSON, not code.
+All three do the same thing: drop the full framework into `./agentos` (or a target directory you name) **and** drop a status board — `agentos-status.html` — right at your project's root, no digging through subfolders required. No runtime dependencies get pulled in — it's markdown and JSON, not code.
 
-> **Note:** AgentOS is a spec, not a runtime. There's nothing to start or daemonize — installing it just puts the framework's files in your project for an orchestrator (a Claude Code session, a custom agent runner, whatever you're using) to read and act on.
+> **Note:** AgentOS is a spec, not a runtime. There's nothing to start or daemonize — installing it just puts the framework's files (and the status board) in your project for an orchestrator (a Claude Code session, a custom agent runner, whatever you're using) to read and act on.
 
 Then:
 
@@ -70,6 +71,16 @@ Then:
 - 🔧 **Plugin SDK** — add third-party agents, tools, or workflow steps without forking the core
 - 📊 **Live Dashboard** — a reference implementation of task/review status, ready to wire to a real backend
 - 🔗 **MCP Integration** — agents reach external tools through the Model Context Protocol, scoped per role
+
+---
+
+## Status Board
+
+Every install — `npx agentos-kit`, the curl script, or `install.sh` — always drops a status board at `./agentos-status.html`, sitting at your project's root next to your own files, not buried inside the `agentos/` subdirectory. Open it in a browser and you get a filterable task list: status, role, priority, review flags, and inline findings.
+
+![AgentOS status board sample](docs/dashboard-preview.png)
+
+It ships pre-loaded with sample data so you see the real UI immediately — no setup required to look at it. To make it live, point it at your orchestrator's actual task store per [`DASHBOARD_SPEC.md`](DASHBOARD_SPEC.md). If a file already named `agentos-status.html` exists at your root, the installer leaves it alone and tells you so rather than overwriting it.
 
 ---
 

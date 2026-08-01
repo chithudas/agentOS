@@ -2,6 +2,11 @@
 
 The architecture behind [dashboard/dashboard-template.html](dashboard/dashboard-template.html). The template is a self-contained static reference implementation with sample data; this spec describes what a live deployment needs.
 
+![AgentOS status board sample](docs/dashboard-preview.png)
+
+## 0. Install-time status board
+Both installers ([`bin/cli.js`](bin/cli.js) and [`install.sh`](install.sh)) always copy this template to `./agentos-status.html` at the **host project's root** — not nested inside the `agentos/` subdirectory — the moment AgentOS is installed. The intent is that a status board is always one double-click away, without needing to know the framework's internal directory layout first. If a file of that name already exists at root, the installer skips the copy and says so rather than overwriting it. Until it's wired to a real task store per §1, it renders the sample data baked into the template — a live preview of the shape of the real thing, not a placeholder image.
+
 ## 1. Data source
 - Backing store: the live [TASK_SCHEMA.json](TASK_SCHEMA.json) task set plus each task's latest [AGENT_OUTPUT_SCHEMA.json](AGENT_OUTPUT_SCHEMA.json), as maintained by the orchestrator ([ORCHESTRATOR_SPEC.md](ORCHESTRATOR_SPEC.md)).
 - The dashboard is a read-only view. It never writes task state — any action a human takes (approve, reassign, escalate-response) goes through the orchestrator's own interface/API, not a direct dashboard mutation, so [STATE_MACHINES.md](STATE_MACHINES.md) transitions stay single-authored.

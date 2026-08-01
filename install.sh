@@ -27,6 +27,19 @@ git clone --depth 1 "$REPO_URL" "$TARGET"
 # this copy belongs to the target project now, not to AgentOS's own repo.
 rm -rf "$TARGET/.git" "$TARGET/install.sh"
 
+STATUS_BOARD="agentos-status.html"
+if [ -f "$TARGET/dashboard/dashboard-template.html" ]; then
+  if [ -e "$STATUS_BOARD" ]; then
+    echo
+    echo "Status board skipped — ./$STATUS_BOARD already exists at project root (not overwritten)."
+  else
+    cp "$TARGET/dashboard/dashboard-template.html" "$STATUS_BOARD"
+    echo
+    echo "Status board installed at ./$STATUS_BOARD — open it in a browser for a live task/review view"
+    echo "(ships with sample data; see DASHBOARD_SPEC.md to wire it to a real task store)."
+  fi
+fi
+
 echo
 echo "AgentOS installed at ./$TARGET"
 echo

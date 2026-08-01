@@ -1,6 +1,6 @@
 {
   "name": "agentos-kit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Scaffold the AgentOS multi-agent software-delivery framework into any project",
   "bin": {
     "agentos-kit": "bin/cli.js"
@@ -13,6 +13,7 @@
     "workflows",
     "templates",
     "dashboard",
+    "docs",
     "*.md",
     "*.json"
   ],
