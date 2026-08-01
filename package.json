@@ -30,7 +30,7 @@
     "cli"
   ],
   "license": "MIT",
-  "author": "prodnium",
+  "author": "Chidambara Das Ganesan Nageswari <chithudas@gmail.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/prodnium/agentos.git"
