@@ -1,7 +1,10 @@
 {
-  "name": "create-agent-os",
+  "name": "@chithudas/create-agent-os",
   "version": "1.0.0",
   "description": "Scaffold the AgentOS multi-agent software-delivery framework into any project",
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "create-agent-os": "bin/cli.js"
   },

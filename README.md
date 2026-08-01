@@ -9,8 +9,8 @@ This repo is the spec: a complete set of markdown/JSON documents defining how su
 **Option A — npm (recommended):**
 
 ```bash
-npx create-agent-os
-# or: npm create agent-os@latest
+npx @chithudas/create-agent-os
+# or: npm create @chithudas/agent-os@latest
 ```
 
 **Option B — curl into an existing project:**

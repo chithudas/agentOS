@@ -19,8 +19,8 @@ function printHelp() {
   console.log(`create-agent-os — scaffold the AgentOS framework into a project
 
 Usage:
-  npx create-agent-os [target-dir]
-  npm create agent-os@latest [target-dir]
+  npx @chithudas/create-agent-os [target-dir]
+  npm create @chithudas/agent-os@latest [target-dir]
 
   target-dir   Where to copy AgentOS into (default: agentos)
 
